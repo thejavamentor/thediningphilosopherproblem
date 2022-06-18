@@ -1,0 +1,80 @@
+package learn.funda.concur.philosoper;
+
+class Philosopher extends Thread {
+    Chopstick left ;
+    Chopstick right ;
+    String philosopherName;
+
+    Philosopher(Chopstick left, Chopstick right, String name){
+        this.left = left;
+        this.right = right;
+        philosopherName = name;
+    }
+
+    public boolean pickupChopstick() {
+        boolean lockAcquired = false;
+        int retryCount = 5;
+        int count = 0;
+        while(retryCount > count){
+            if((right.number - left.number) == 1 || right.number - left.number < 0 ) {
+                if (left.pickup()) {
+                    if (right.pickup()) {
+                        lockAcquired = true;
+                        System.out.println(" Lock is acquired on " + left + " and " + right);
+                        break;
+                    } else {
+                        left.putdown();
+                        System.out.println(philosopherName+ " Not able lock on chopstick " + left + " and " + right + " wait for  " + 500/1000.0);
+                        sleepFor1Sec(500);
+                    }
+                } else {
+                    System.out.println(" Lock is not acquired and sleeping for second " + 1000/1000.0);
+                    sleepFor1Sec(1000);
+                }
+            }
+            System.out.println(philosopherName +"Not able acquire lock on "+left+" and "+right+" retry count "+count);
+            count++;
+        }
+        if(lockAcquired == false){
+            System.out.println(" Lock is not able acquired on chopsticks " + left +" and "+right + " by " + philosopherName);
+        }
+        return lockAcquired;
+    }
+
+    private void sleepFor1Sec(int milliSeconds) {
+        try {
+            Thread.sleep(milliSeconds);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void eat(){
+        System.out.println(""+philosopherName+" is eating with chopstick "+left.number+" and "+right.number);
+    }
+
+    public void putdownBothChopstick(){
+        right.putdown();
+        System.out.println("Lock is released for " + right);
+        left.putdown();
+        System.out.println("Lock is released for " + left);
+    }
+
+    public void run() {
+        boolean res = pickupChopstick();
+
+            if (res) {
+                for (int i = 0; i < 5; i++) {
+                    System.out.println(" " + philosopherName + " is eating byte " + (i + 1));
+                    eat();
+                }
+                System.out.println("" + philosopherName + " has ate and out ");
+                putdownBothChopstick();
+            } else {
+                System.out.println("Lock is not able to acquire :" + philosopherName);
+            }
+
+
+    }
+
+}
