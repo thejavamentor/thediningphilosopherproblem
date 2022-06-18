@@ -1,0 +1,29 @@
+package learn.funda.concur.philosoper;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+public class Chopstick {
+    Lock lock;
+    int number;
+
+    Chopstick(int number){
+        this.number = number;
+        lock = new ReentrantLock();
+    }
+
+    public boolean pickup(){
+        return lock.tryLock();
+    }
+
+    public void putdown(){
+       lock.unlock();
+    }
+
+    @Override
+    public String toString() {
+        return "Chopstick{" +
+                " number=" + number +
+                '}';
+    }
+}
